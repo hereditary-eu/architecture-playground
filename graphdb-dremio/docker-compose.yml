@@ -2,11 +2,10 @@
 services:
   graphdb:
     image: ontotext/graphdb:10.7.3
-    container_name: graphdb
     ports:
       - "7200:7200"
     volumes:
-      - graphdb_data:/opt/graphdb/home
+      - ./volumes-gitexclude/graphdb:/opt/graphdb/home
       - ./jdbc:/opt/graphdb/dist/lib/jdbc
     environment:
       - GRAPHDB_HOME=/opt/graphdb/home
@@ -16,31 +15,38 @@ services:
       
   dremio:
     image: dremio/dremio-oss
-    container_name: dremio
+    user: root
     ports:
       - "9047:9047"
       - "31010:31010"
       - "32010:32010"
       - "45678:45678"
     volumes:
-      - dremio_data:/opt/dremio/data
-      - dremio_logs:/opt/dremio/logs
-      - ./mockdata/csv:/csv
+      - ./volumes-gitexclude/dremio/data:/opt/dremio/data
+      - ./volumes-gitexclude/dremio/logs:/opt/dremio/logs
+      - ./data/csv:/csv
       - ./jdbc:/jdbc
     networks:
       - db_network
+    entrypoint: |
+      /bin/bash -c "
+      echo 'Copying driver'
+      cp -n /opt/dremio/jars/jdbc-driver/*.jar /jdbc/driver-gitexclude.jar
+      echo 'Starting dremio'
+      cd /opt/dremio
+      bin/dremio start-fg 
+      " 
 
-  db:
+  postgres:
     image: postgres:16.4-alpine3.20
-    container_name: postgres_db
     environment:
       # Example auth - just for testing purposes
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: example
     volumes:
-      - db_data:/var/lib/postgresql/data
-      - ./mockdata/postgres:/docker-entrypoint-initdb.d
+      - ./volumes-gitexclude/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
@@ -49,25 +55,16 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:7.8 # Ensure this is the latest stable version or a specific version
-    container_name: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "8080:80"
     depends_on:
-      - db
+      - postgres
     networks:
       - db_network
 
 networks:
   db_network:
     driver: bridge
-
-
-
-volumes:
-  graphdb_data:
-  db_data:
-  dremio_data:
-  dremio_logs:

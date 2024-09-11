@@ -9,5 +9,5 @@
 
 set -e
 echo "Setting up the mock database..."
-pg_restore -U $POSTGRES_USER -d $POSTGRES_DB /docker-entrypoint-initdb.d/dvdrental.tar
+psql -U $POSTGRES_USER -d $POSTGRES_DB -f /docker-entrypoint-initdb.d/database.sql
 echo "Database initialized successfully!"

@@ -1,7 +1,13 @@
+# Big files/folder you want to avoid committing at all cost
+*-gitexclude
+*-gitexclude.*
+generated_*.csv
+
+
 # JDBC driver (remember to extract it at runtime)
 jdbc/driver.jar
 
-generated_*.csv
+
 
 
 # Node modules directory
@@ -17,6 +23,7 @@ yarn-error.log*
 # OS generated files
 .DS_Store
 Thumbs.db
+*Zone.Identifier
 
 # Dependency directories
 node_modules/
