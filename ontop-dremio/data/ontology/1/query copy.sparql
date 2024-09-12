@@ -1,0 +1,11 @@
+PREFIX ex: <http://example.org/>
+
+SELECT ?test ?testDate ?testType ?resultValue ?resultUnit
+WHERE {
+    ?test a ex:BloodTest ;
+          ex:testsForPatient <http://example.org/patients/1> ;
+          ex:hasTestDate ?testDate ;
+          ex:hasTestType ?testType ;
+          ex:hasResultValue ?resultValue ;
+          ex:hasResultUnit ?resultUnit .
+}
