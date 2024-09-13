@@ -23,6 +23,6 @@
         rr:tableName "postgres2.public.patients" ;
     ] ;
     rr:subjectMap [
-        rr:template "http://example.org/patients2/{patient_id}" ;
+        rr:template "http://example.org/patients/{patient_uuid}" ;
         rr:class <http://example.org/Patient> ;
     ].

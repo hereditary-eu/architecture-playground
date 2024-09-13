@@ -1,4 +1,4 @@
-CREATE TABLE patients_with_uuid (
+CREATE TABLE patients (
     patient_uuid UUID PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -8,7 +8,7 @@ CREATE TABLE patients_with_uuid (
 );
 
 -- Inserting 20 patients with generated UUIDs
-INSERT INTO patients_with_uuid (patient_uuid, first_name, last_name, age, gender, diagnosis)
+INSERT INTO patients (patient_uuid, first_name, last_name, age, gender, diagnosis)
 VALUES 
   (gen_random_uuid(), 'John', 'Doe', 45, 'Male', 'Hypertension'),
   (gen_random_uuid(), 'Jane', 'Smith', 30, 'Female', 'Asthma'),

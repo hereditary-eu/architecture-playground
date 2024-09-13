@@ -97,7 +97,3 @@ services:
 networks:
   dbtest_network:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet:  10.103.0.1/16
