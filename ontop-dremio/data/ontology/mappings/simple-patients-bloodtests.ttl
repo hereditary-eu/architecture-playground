@@ -1,0 +1,46 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix :  <http://example.org/> .
+
+# Base URI for the RDF data
+
+@base <http://example.org/> .
+
+# Mapping for the 'patients' table
+<#PatientsMapping>
+    rr:logicalTable [
+        rr:tableName "postgres1.public.patients" ;
+    ] ;
+    rr:subjectMap [
+        rr:template "http://example.org/patients2/{patient_id}" ;
+        rr:class <http://example.org/Patient> ;
+    ];
+    rr:predicateObjectMap [
+      rr:predicate :hasName;
+      rr:objectMap [ rr:column "first_name" ];
+    ] .
+
+<#BloodMapping>
+    rr:logicalTable [
+        rr:tableName "postgres1.public.blood_tests" ;
+    ] ;
+    rr:subjectMap [
+        rr:template "http://example.org/bloodtest/{test_id}" ;
+        rr:class <http://example.org/BloodTest> ;
+    ];
+    rr:predicateObjectMap [
+      rr:predicate rdf:type;
+      rr:objectMap [ rr:template "http://example.org/{test_type}" ];
+    ] .
+
+
+<#PatientsMapping2>
+    rr:logicalTable [
+        rr:tableName "postgres2.public.patients" ;
+    ] ;
+    rr:subjectMap [
+        rr:template "http://example.org/patients/{patient_uuid}" ;
+        rr:class <http://example.org/Patient> ;
+    ].

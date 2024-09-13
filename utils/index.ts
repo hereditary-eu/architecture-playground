@@ -26,7 +26,33 @@ export const pgLoadSQLData = async (pg: Client, filePath : string, logSql = fals
   //console.log("SQL file loaded successfully!");
 }
 
-export const pgClear = (...args: Client[]) => Promise.all(args.map(client => pgLoadSQLData(client, './data/postgres/clean.sql')))
+const clearSQL = `
+DO $$ 
+DECLARE
+    rec RECORD;
+BEGIN
+    -- Disable all constraints
+    FOR rec IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'ALTER TABLE ' || rec.tablename || ' DISABLE TRIGGER ALL';
+    END LOOP;
+
+    -- Delete all tables
+    FOR rec IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || rec.tablename || ' CASCADE';
+    END LOOP;
+
+    -- Drop sequences
+    FOR rec IN (SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public') LOOP
+        EXECUTE 'DROP SEQUENCE IF EXISTS ' || rec.sequence_name || ' CASCADE';
+    END LOOP;
+
+    -- Drop views
+    FOR rec IN (SELECT table_name FROM information_schema.views WHERE table_schema = 'public') LOOP
+        EXECUTE 'DROP VIEW IF EXISTS ' || rec.table_name || ' CASCADE';
+    END LOOP;
+END $$;
+`
+export const pgClear = (...args: Client[]) => Promise.all(args.map(pg => pg.queryArray(clearSQL)))
 
 export const pgLogTables = async (client: Client) => {
   const result = await client.queryObject(` SELECT table_name FROM information_schema.tables
@@ -234,13 +260,14 @@ export const ontopRunQuery = async (args: Record<string, string> = {}, queryStri
   if(queryString) await Deno.writeTextFile(`./data/ontology/${queryFile}`, queryString)
 
   const res = await ontopExec({
-    mapping: "/opt/ontop/input/1/mapping.ttl",
     query: `/opt/ontop/input/${queryFile}`,
     dbUrl: "jdbc:dremio:direct=dremio:31010",
     dbUser: "dremioUser",
     dbPassword: "dremioPass1",
     output: `/opt/ontop/input/${outFile}`,
-    ...args
+    ...args,
+    mapping: `/opt/ontop/input/${args.mapping || 'ontop-website-mapping.ttl'}`,
+
   });
 
   if(settings.debug) console.log(res)

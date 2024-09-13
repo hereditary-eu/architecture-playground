@@ -16,7 +16,25 @@
     rr:subjectMap [
         rr:template "http://example.org/patients2/{patient_id}" ;
         rr:class <http://example.org/Patient> ;
-    ].
+    ];
+    rr:predicateObjectMap [
+      rr:predicate :hasName;
+      rr:objectMap [ rr:column "first_name" ];
+    ] .
+
+<#BloodMapping>
+    rr:logicalTable [
+        rr:tableName "postgres1.public.blood_tests" ;
+    ] ;
+    rr:subjectMap [
+        rr:template "http://example.org/bloodtest/{test_id}" ;
+        rr:class <http://example.org/BloodTest> ;
+    ];
+    rr:predicateObjectMap [
+      rr:predicate rdf:type;
+      rr:objectMap [ rr:template "http://example.org/{test_type}" ];
+    ] .
+
 
 <#PatientsMapping2>
     rr:logicalTable [
